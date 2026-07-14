@@ -1,0 +1,67 @@
+# ═══════════════════════════════════════════════
+#  Drowsiness Detection v2 — Configuration
+# ═══════════════════════════════════════════════
+
+model:
+  backbone: "efficientnet_b2"     # stronger than MobileNetV3
+  pretrained: true
+  dropout: 0.4
+  input_size: 224                 # larger input = more detail captured
+  unfreeze_at_epoch: 5            # freeze backbone for first N epochs
+
+training:
+  epochs: 60
+  batch_size: 32
+  learning_rate: 0.0003
+  weight_decay: 0.0001
+  early_stopping_patience: 12
+  focal_loss_gamma: 2.5
+  focal_loss_alpha: 0.75          # higher weight for drowsy class
+  label_smoothing: 0.05           # prevents overconfident predictions
+  mixup_alpha: 0.2                # MixUp augmentation strength
+  num_workers: 4
+  grad_clip: 1.0
+
+dataset:
+  root: "dataset"
+  image_size: 224
+
+augmentation:
+  # Training augmentations (aggressive for generalization)
+  random_brightness_limit: 0.3
+  random_contrast_limit: 0.3
+  hue_shift_limit: 10
+  horizontal_flip_p: 0.5
+  rotate_limit: 15
+  blur_limit: 3
+  coarse_dropout_p: 0.3          # randomly blacks out patches (simulates occlusion)
+  random_shadow_p: 0.2           # simulates lighting changes in car
+  elastic_transform_p: 0.1
+
+inference:
+  ema_alpha: 0.25                 # lower = smoother, less flickering
+  drowsy_threshold: 0.55          # slightly above 0.5 to reduce false alarms
+  consecutive_frames: 15          # N straight drowsy frames (0.5s) to filter out normal blinks
+  alarm_cooldown_sec: 4.0
+  display_width: 900
+  display_height: 650
+
+rl:
+  state_dim: 5                    # [p_drowsy, EAR, MAR, PERCLOS, norm_confidence]
+  action_dim: 2                   # 0=ALERT, 1=DROWSY
+  hidden_dim: 128
+  learning_rate: 0.0005
+  gamma: 0.97
+  epsilon_start: 0.8             # lower start = trust CNN more from beginning
+  epsilon_end: 0.005
+  epsilon_decay: 0.998
+  replay_buffer_size: 50000
+  batch_size: 128
+  target_update_freq: 200
+  min_buffer_before_train: 500    # don't train RL until buffer has N samples
+
+paths:
+  checkpoints: "outputs/checkpoints"
+  reports: "outputs/reports"
+  best_model: "outputs/checkpoints/best_model.pt"
+  global_rl: "outputs/checkpoints/global_rl.pt"

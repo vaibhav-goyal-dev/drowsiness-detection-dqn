@@ -1,0 +1,38 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# PyTorch checkpoints and large binaries
+*.pt
+*.pth
+*.onnx
+
+# Local outputs and temporary runs
+outputs/checkpoints/
+outputs/reports/confusion_matrix.png
+outputs/reports/roc_curve.png
+outputs/reports/metrics.json
+
+# Dataset (Usually too large for GitHub, should be hosted/downloaded separately)
+dataset/
+
+# OS/IDE specific files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
